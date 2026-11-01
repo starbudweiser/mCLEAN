@@ -38,7 +38,7 @@ struct PanelView: View {
         HStack {
             Text(branded: "mCLEAN").socle(Socle.T.title)
             Spacer()
-            MenuAnchor(onMenu: onMenu)
+            MenuAnchor(onMenu: onMenu).frame(width: 24, height: 24)
         }
         .padding(.horizontal, Socle.M.space4)
         .frame(minHeight: Socle.M.sizeBar)
@@ -200,6 +200,7 @@ private struct MenuAnchor: NSViewRepresentable {
         let button = NSButton(image: NSImage(systemSymbolName: "gearshape", accessibilityDescription: L("menu.settings")) ?? NSImage(),
                               target: context.coordinator, action: #selector(Coordinator.clicked))
         button.isBordered = false
+        button.contentTintColor = NSColor(Socle.C.action) // jaune Socle
         button.toolTip = L("menu.settings")
         return button
     }
