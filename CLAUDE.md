@@ -10,7 +10,7 @@ App macOS personnelle de barre de menus, version perso de Memory Cleaner (AppYog
 - Réglages : JSON dans UserDefaults (`AppSettings`, décodage tolérant).
 
 ## Commandes
-- Tests : `swift test` (16 tests). App : `./build.sh` → `~/Applications/Utilitaires+/mCLEAN.app` (signé via `sign_app.sh`).
+- Tests : `swift test` (16 tests). App : `./build.sh` → `~/Applications/Home Applications/mCLEAN.app` (signé via `sign_app.sh`).
 - Essais réels : `SELFTEST=1 ./build.sh` puis `build/mCLEAN.app/Contents/MacOS/mCLEAN --selftest status|clean|deep|render <dossier>`.
 - Langues : `tools/strings_table.py` → `python3 tools/gen_strings.py`. Icône : `assets/make_icon.py` (PyQt6, `QT_QPA_PLATFORM=offscreen`).
 - Couleur du logo (« m » du nom) : vert #34D399 (`Brand`).
