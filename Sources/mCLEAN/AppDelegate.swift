@@ -81,18 +81,18 @@ final class StatusController: NSObject, NSMenuDelegate {
 
     @objc private func openSettings() {
         popover.performClose(nil)
-        SettingsWindow.show(model: model)
+        DispatchQueue.main.async { [model] in SettingsWindow.show(model: model) } // après la fermeture du panneau
     }
 
     @objc private func checkUpdates() {
         popover.performClose(nil)
         model.updater.check()
-        SettingsWindow.show(model: model, tab: .updates)
+        DispatchQueue.main.async { [model] in SettingsWindow.show(model: model, tab: .updates) }
     }
 
     @objc private func openAbout() {
         popover.performClose(nil)
-        About.show()
+        DispatchQueue.main.async { About.show() }
     }
 
     @objc private func quit() { NSApp.terminate(nil) }

@@ -34,8 +34,7 @@ enum SettingsWindow {
             w.center()
             window = w
         }
-        NSApp.activate()
-        window?.makeKeyAndOrderFront(nil)
+        window?.present()
     }
 }
 
