@@ -15,7 +15,7 @@ Personal macOS menu bar app, a take on AppYogi's Memory Cleaner: live available 
 Release: bump the version in `Resources/Info.plist`, commit, run `./release.sh` (build, Developer ID signing, notarization, stapling, zip, push, GitHub release). Because updates must keep the same signing requirement, every published build is Developer ID signed; a locally signed build will not auto-update to one.
 
 ## Commands
-- Tests: `swift test` (21 tests). App: `./build.sh` → `~/Applications/Home Applications/mCLEAN.app` (signed through `sign_app.sh`).
+- Tests: `swift test` (21 tests). App: `./build.sh` → `~/Applications/Applications Personnelles/mCLEAN.app` (signed through `sign_app.sh`).
 - Real-world checks: `SELFTEST=1 ./build.sh`, then `build/mCLEAN.app/Contents/MacOS/mCLEAN --selftest status|clean|deep|update|login|render <dir>` (`deep` asks for the admin password; `render` writes PNGs of the panel, settings and About).
 - Languages (fr, en, es, it): `tools/strings_table.py` → `python3 tools/gen_strings.py`. Icon: `assets/make_icon.py` (PyQt6, `QT_QPA_PLATFORM=offscreen`).
 - Logo color (the "m" of the name): green #34D399 (`Brand`).
