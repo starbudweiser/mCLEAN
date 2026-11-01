@@ -38,7 +38,7 @@ enum About {
         return field
     }
 
-    private static func makeWindow() -> NSWindow {
+    static func makeWindow() -> NSWindow {
         let info = Bundle.main.infoDictionary ?? [:]
         let version = info["CFBundleShortVersionString"] as? String ?? "?"
         let build = info["CFBundleVersion"] as? String ?? "?"

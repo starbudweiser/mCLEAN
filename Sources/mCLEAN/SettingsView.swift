@@ -3,12 +3,13 @@ import MCleanCore
 import SwiftUI
 
 enum SettingsTab: String, CaseIterable {
-    case general, auto, apps
+    case general, auto, apps, updates
     var title: String {
         switch self {
         case .general: L("settings.general")
         case .auto: L("settings.auto")
         case .apps: L("settings.apps")
+        case .updates: L("settings.updates")
         }
     }
 }
@@ -17,9 +18,14 @@ enum SettingsTab: String, CaseIterable {
 enum SettingsWindow {
     private static var window: NSWindow?
 
-    static func show(model: AppModel) {
-        if window == nil {
-            let hosting = NSHostingController(rootView: SettingsView().environmentObject(model))
+    static var requestedTab: SettingsTab?
+
+    static func show(model: AppModel, tab: SettingsTab? = nil) {
+        requestedTab = tab
+        window?.close()
+        window = nil
+        do {
+            let hosting = NSHostingController(rootView: SettingsView(tab: tab ?? .general).environmentObject(model))
             hosting.sizingOptions = .preferredContentSize
             let w = NSWindow(contentViewController: hosting)
             w.styleMask = [.titled, .closable]
@@ -45,6 +51,7 @@ struct SettingsView: View {
             case .general: general
             case .auto: auto
             case .apps: apps
+            case .updates: updates
             }
             Spacer(minLength: 0)
         }
@@ -126,6 +133,37 @@ struct SettingsView: View {
             slider(L("settings.cooldown"), value: L("unit.minutes", model.settings.cooldownMinutes),
                    intBinding(\.cooldownMinutes), 5...120, step: 5)
             toggle(L("settings.notifyClean"), $model.settings.notifyClean)
+        }
+    }
+
+    private var updates: some View {
+        VStack(alignment: .leading, spacing: Socle.M.space3) {
+            toggle(L("updates.auto"), $model.settings.autoUpdate)
+            Text(L("updates.autoHelp")).socle(Socle.T.meta).foregroundStyle(Socle.C.textMuted).fixedSize(horizontal: false, vertical: true)
+            Text(L("updates.current", model.updater.currentVersion)).socle(Socle.T.monoSm).foregroundStyle(Socle.C.textMuted)
+            Text(updateStatus).socle(Socle.T.body).foregroundStyle(updateIsError ? Socle.C.danger : Socle.C.text)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: Socle.M.space2) {
+                Button(L("updates.check")) { model.updater.check() }
+                    .buttonStyle(SocleButtonStyle(.secondary)).disabled(model.updater.isBusy)
+                if case .available(let release) = model.updater.state {
+                    Button(L("updates.install")) { model.updater.install(release) }.buttonStyle(SocleButtonStyle(.primary))
+                }
+            }
+        }
+    }
+
+    private var updateIsError: Bool { if case .failed = model.updater.state { true } else { false } }
+
+    private var updateStatus: String {
+        switch model.updater.state {
+        case .idle: L("updates.idle")
+        case .checking: L("updates.checking")
+        case .upToDate: L("updates.upToDate")
+        case .available(let r): L("updates.available", r.version)
+        case .downloading(let v): L("updates.downloading", v)
+        case .installing: L("updates.installing")
+        case .failed(let key): L(key)
         }
     }
 

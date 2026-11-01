@@ -45,6 +45,7 @@ final class AppModel: ObservableObject {
         }
     }
     var panelOpen = false
+    private(set) lazy var updater = UpdateManager(model: self)
     var onChange: (() -> Void)?
 
     private var timer: Timer?
@@ -54,6 +55,7 @@ final class AppModel: ObservableObject {
     private var lastActive: [String: Date] = [:]
     private var notified = Set<String>()
     private var activation: NSObjectProtocol?
+    private var bag = Set<AnyCancellable>()
 
     init() {
         snapshot = MemoryProbe.snapshot() ?? MemorySnapshot(
@@ -77,6 +79,8 @@ final class AppModel: ObservableObject {
         }
         scheduleTimer()
         tick()
+        updater.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        updater.start()
     }
 
     private func applyTheme() {

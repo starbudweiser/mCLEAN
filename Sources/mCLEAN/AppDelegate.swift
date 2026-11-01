@@ -72,6 +72,7 @@ final class StatusController: NSObject, NSMenuDelegate {
             menu.addItem(entry)
         }
         add(L("menu.settings"), #selector(openSettings))
+        add(L("menu.checkUpdates"), #selector(checkUpdates))
         menu.addItem(.separator())
         add(L("about.menu"), #selector(openAbout))
         add(L("menu.quit"), #selector(quit))
@@ -81,6 +82,12 @@ final class StatusController: NSObject, NSMenuDelegate {
     @objc private func openSettings() {
         popover.performClose(nil)
         SettingsWindow.show(model: model)
+    }
+
+    @objc private func checkUpdates() {
+        popover.performClose(nil)
+        model.updater.check()
+        SettingsWindow.show(model: model, tab: .updates)
     }
 
     @objc private func openAbout() {

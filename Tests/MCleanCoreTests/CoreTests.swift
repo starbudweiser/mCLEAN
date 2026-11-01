@@ -123,3 +123,55 @@ final class CoreTests: XCTestCase {
         XCTAssertFalse(MemoryProbe.footprintsByResponsiblePID().isEmpty)
     }
 }
+
+final class UpdaterTests: XCTestCase {
+    func testVersionOrdering() throws {
+        XCTAssertTrue(try XCTUnwrap(AppVersion("1.10.0")) > XCTUnwrap(AppVersion("1.9.9")))
+        XCTAssertEqual(AppVersion("v1.2"), AppVersion("1.2.0"))
+        XCTAssertEqual(AppVersion("2.0.0-beta"), AppVersion("2"))
+        XCTAssertNil(AppVersion("abc"))
+        XCTAssertNil(AppVersion("1.2.3.4"))
+        XCTAssertTrue(isUpdate(latest: "v1.1.0", over: "1.0.0"))
+        XCTAssertFalse(isUpdate(latest: "1.0.0", over: "1.0.0"))
+        XCTAssertFalse(isUpdate(latest: "0.9", over: "1.0.0"))
+        XCTAssertFalse(isUpdate(latest: "n'importe quoi", over: "1.0.0"))
+    }
+
+    private func release(tag: String = "v1.2.0", draft: Bool = false, pre: Bool = false, name: String = "mCLEAN-1.2.0.zip",
+                         url: String = "https://api.github.com/repos/a/b/releases/assets/7") -> Data {
+        let json: [String: Any] = ["tag_name": tag, "draft": draft, "prerelease": pre, "body": "notes",
+                                   "assets": [["name": "autre.txt", "url": url], ["name": name, "url": url]]]
+        return try! JSONSerialization.data(withJSONObject: json)
+    }
+
+    func testReleaseParsing() throws {
+        let info = try XCTUnwrap(ReleaseParser.parse(release(), assetPrefix: "mCLEAN-"))
+        XCTAssertEqual(info.version, "1.2.0")
+        XCTAssertEqual(info.assetName, "mCLEAN-1.2.0.zip")
+        XCTAssertNil(ReleaseParser.parse(release(draft: true), assetPrefix: "mCLEAN-"))
+        XCTAssertNil(ReleaseParser.parse(release(pre: true), assetPrefix: "mCLEAN-"))
+        XCTAssertNil(ReleaseParser.parse(release(name: "autre-1.2.0.zip"), assetPrefix: "mCLEAN-"))
+        XCTAssertNil(ReleaseParser.parse(release(tag: "nightly"), assetPrefix: "mCLEAN-"))
+        XCTAssertNil(ReleaseParser.parse(Data("[]".utf8), assetPrefix: "mCLEAN-"))
+    }
+
+    func testAssetMustComeFromGitHubAPI() {
+        XCTAssertNil(ReleaseParser.parse(release(url: "https://evil.example/mCLEAN.zip"), assetPrefix: "mCLEAN-"))
+        XCTAssertNil(ReleaseParser.parse(release(url: "http://api.github.com/x"), assetPrefix: "mCLEAN-"))
+    }
+
+    func testInstallScriptQuotesPathsAndRestoresOnFailure() {
+        let script = InstallScript.make(pid: 42, newApp: "/tmp/it's new/mCLEAN.app", destination: "/Users/x y/Apps/mCLEAN.app")
+        XCTAssertTrue(script.contains("kill -0 42"))
+        XCTAssertTrue(script.contains("'/tmp/it'\\''s new/mCLEAN.app'"))
+        XCTAssertTrue(script.contains("'/Users/x y/Apps/mCLEAN.app.old'"))
+        XCTAssertTrue(script.contains("mv '/Users/x y/Apps/mCLEAN.app.old' '/Users/x y/Apps/mCLEAN.app'"))
+        XCTAssertTrue(script.contains("open -g"))
+    }
+
+    func testAutoUpdateDefaultsOnAndSurvivesMissingKey() {
+        XCTAssertTrue(AppSettings().autoUpdate)
+        XCTAssertFalse(AppSettings.decode(Data(#"{"autoUpdate":false}"#.utf8)).autoUpdate)
+        XCTAssertTrue(AppSettings.decode(Data(#"{"autoClean":true}"#.utf8)).autoUpdate)
+    }
+}

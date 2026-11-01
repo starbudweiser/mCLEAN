@@ -19,6 +19,7 @@ struct PanelView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
+            updateBanner
             VStack(alignment: .leading, spacing: Socle.M.space3) {
                 gauge
                 breakdown
@@ -42,6 +43,18 @@ struct PanelView: View {
         .padding(.horizontal, Socle.M.space4)
         .frame(minHeight: Socle.M.sizeBar)
         .background(Socle.C.surfaceRaised)
+    }
+
+    @ViewBuilder private var updateBanner: some View {
+        if case .available(let release) = model.updater.state, !model.settings.autoUpdate {
+            HStack {
+                Text(L("updates.available", release.version)).socle(Socle.T.label).foregroundStyle(Socle.C.textStrong)
+                Spacer()
+                Button(L("updates.install")) { model.updater.install(release) }.buttonStyle(SocleButtonStyle(.primary, height: 26))
+            }
+            .padding(.horizontal, Socle.M.space4).padding(.vertical, Socle.M.space2)
+            .background(Socle.C.surfaceSelected)
+        }
     }
 
     private var gauge: some View {

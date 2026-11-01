@@ -12,6 +12,7 @@ enum SelfTest {
         case "status": status()
         case "clean": clean(.standard)
         case "deep": clean(.deep)
+        case "update": update()
         case "render": render(to: URL(fileURLWithPath: args[i + 2]))
         default: print("commande inconnue")
         }
@@ -52,6 +53,16 @@ enum SelfTest {
         try? rep.representation(using: .png, properties: [:])?.write(to: url)
     }
 
+    /// Recherche, téléchargement et contrôle de la dernière release, sans rien installer.
+    private static func update() {
+        _ = NSApplication.shared
+        let model = AppModel()
+        model.updater.check()
+        func wait(_ done: () -> Bool) { let end = Date().addingTimeInterval(60); while !done() && Date() < end { RunLoop.main.run(until: Date().addingTimeInterval(0.2)) } }
+        wait { !model.updater.isBusy }
+        print("état :", model.updater.state, "version locale :", model.updater.currentVersion)
+    }
+
     private static func render(to dir: URL) {
         _ = NSApplication.shared
         NSApp.setActivationPolicy(.prohibited) // jamais de fenêtre ni d'icône pendant l'essai
@@ -65,7 +76,20 @@ enum SelfTest {
         for tab in SettingsTab.allCases {
             save(SettingsView(tab: tab).environmentObject(model), size: NSSize(width: 440, height: 400), to: dir.appendingPathComponent("settings-\(tab.rawValue).png"))
         }
+        let about = About.makeWindow()
+        about.appearance = NSAppearance(named: .darkAqua)
+        about.contentView?.appearance = NSAppearance(named: .darkAqua)
+        about.contentView?.wantsLayer = true
+        about.contentView?.layer?.backgroundColor = NSColor(white: 0.12, alpha: 1).cgColor
+        save(about.contentView.map { AnyView(NSViewBox($0)) } ?? AnyView(EmptyView()), size: about.contentView?.frame.size, to: dir.appendingPathComponent("about.png"))
         print("OK", dir.path)
     }
+}
+
+private struct NSViewBox: NSViewRepresentable {
+    let view: NSView
+    init(_ view: NSView) { self.view = view }
+    func makeNSView(context: Context) -> NSView { view }
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }
 #endif

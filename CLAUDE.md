@@ -9,8 +9,12 @@ App macOS personnelle de barre de menus, version perso de Memory Cleaner (AppYog
 - Empreinte par appli : `proc_pid_rusage` cumulée sur le processus responsable.
 - Réglages : JSON dans UserDefaults (`AppSettings`, décodage tolérant).
 
+## Mise à jour automatique
+- `UpdateManager` : releases GitHub de starbudweiser/mCLEAN (jeton via `gh auth token`, dépôt privé). Une requête par jour, téléchargement de `mCLEAN-X.Y.Z.zip`, contrôle (identifiant, version, `codesign --verify`, même exigence de signature que l'appli en cours), puis script `InstallScript` qui remplace le paquet et relance (`open -g`). Réglage `autoUpdate` (défaut oui) ; sinon bouton Installer dans le panneau.
+- Publier : monter la version dans `Resources/Info.plist`, commiter, `./release.sh` (build, zip, push, release).
+
 ## Commandes
-- Tests : `swift test` (16 tests). App : `./build.sh` → `~/Applications/Home Applications/mCLEAN.app` (signé via `sign_app.sh`).
+- Tests : `swift test` (21 tests). App : `./build.sh` → `~/Applications/Home Applications/mCLEAN.app` (signé via `sign_app.sh`).
 - Essais réels : `SELFTEST=1 ./build.sh` puis `build/mCLEAN.app/Contents/MacOS/mCLEAN --selftest status|clean|deep|render <dossier>`.
 - Langues : `tools/strings_table.py` → `python3 tools/gen_strings.py`. Icône : `assets/make_icon.py` (PyQt6, `QT_QPA_PLATFORM=offscreen`).
 - Couleur du logo (« m » du nom) : vert #34D399 (`Brand`).
