@@ -13,6 +13,7 @@ enum SelfTest {
         case "clean": clean(.standard)
         case "deep": clean(.deep)
         case "update": update()
+        case "login": login()
         case "render": render(to: URL(fileURLWithPath: args[i + 2]))
         default: print("commande inconnue")
         }
@@ -51,6 +52,13 @@ enum SelfTest {
         guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return }
         host.cacheDisplay(in: host.bounds, to: rep)
         try? rep.representation(using: .png, properties: [:])?.write(to: url)
+    }
+
+    /// Active puis désactive l'ouverture à la connexion (sans laisser de trace).
+    private static func login() {
+        print("avant :", LoginItem.enabled)
+        print("activation :", LoginItem.set(true), "->", LoginItem.enabled)
+        print("désactivation :", LoginItem.set(false), "->", LoginItem.enabled)
     }
 
     /// Recherche, téléchargement et contrôle de la dernière release, sans rien installer.
