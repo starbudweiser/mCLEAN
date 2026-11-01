@@ -18,4 +18,3 @@ App macOS personnelle de barre de menus, version perso de Memory Cleaner (AppYog
 ## Points ouverts
 - Nettoyage profond (`purge`) non testé en réel (mot de passe administrateur requis).
 - Notifications et ouverture à la connexion non testées en réel dans l'app seule.
-- Pas de dépôt GitHub créé (création refusée par le classifieur le 01/11/2026).
