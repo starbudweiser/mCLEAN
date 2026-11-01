@@ -1,24 +1,25 @@
-# mCLEAN — contexte projet
+# mCLEAN — project context
 
-App macOS personnelle de barre de menus, version perso de Memory Cleaner (AppYogi) : mémoire disponible en direct, détail (applis, résidente, compressée, cache, libre), pression, swap, nettoyage en un clic, nettoyage profond, nettoyage automatique sous un seuil, applis inactives (notification, bouton Quitter).
+Personal macOS menu bar app, a take on AppYogi's Memory Cleaner: live available memory, breakdown (app, wired, compressed, cache, free), pressure, swap, one-click clean, deep clean, automatic clean under a threshold, inactive apps (notification, Quit button).
 
 ## Architecture
-- `Sources/MCleanCore` : logique sans AppKit (relevé Mach/sysctl, calculs, limites de nettoyage, réglages, règles auto/inactif). Toute logique testable va ici.
-- `Sources/mCLEAN` : app AppKit + SwiftUI (`LSUIElement`), thème Socle (`Socle.swift` recopié par `build.sh`). `AppModel` (état), `AppDelegate` (icône de barre de menus, panneau), `PanelView`, `SettingsView`, `Notifier`, `About`.
-- Nettoyage : alloue des pages par paliers de 0,5 Go (`mmap`) pour pousser le cache de fichiers hors de la RAM, libère, s'arrête dès pression ≠ normale, swap/compression en hausse, réserve de 2 Go ou durée max. « Profond » ajoute `purge` (mot de passe via osascript) et vise aussi 25 % de la mémoire des applis.
-- Empreinte par appli : `proc_pid_rusage` cumulée sur le processus responsable.
-- Réglages : JSON dans UserDefaults (`AppSettings`, décodage tolérant).
+- `Sources/MCleanCore`: logic without AppKit (Mach/sysctl probe, computations, cleaning limits, settings, auto/inactive rules, update parsing). Anything testable goes here.
+- `Sources/mCLEAN`: AppKit + SwiftUI app (`LSUIElement`), Socle theme (`Socle.swift`, copied by `build.sh`). `AppModel` (state), `AppDelegate` (status item, panel), `PanelView`, `SettingsView`, `Notifier`, `About`, `UpdateManager`.
+- Cleaning: allocates pages in 0.5 GB steps (`mmap`) to push the file cache out of RAM, releases them, stops as soon as pressure is not normal, swap/compression grows, a 2 GB reserve is reached or the time limit passes. "Deep" adds `purge` (password through osascript) and also aims at 25 % of app memory.
+- Per-app footprint: `proc_pid_rusage` summed on the responsible process.
+- Settings: JSON in UserDefaults (`AppSettings`, tolerant decoding).
 
-## Mise à jour automatique
-- `UpdateManager` : releases GitHub de starbudweiser/mCLEAN (jeton via `gh auth token`, dépôt privé). Une requête par jour, téléchargement de `mCLEAN-X.Y.Z.zip`, contrôle (identifiant, version, `codesign --verify`, même exigence de signature que l'appli en cours), puis script `InstallScript` qui remplace le paquet et relance (`open -g`). Réglage `autoUpdate` (défaut oui) ; sinon bouton Installer dans le panneau.
-- Publier : monter la version dans `Resources/Info.plist`, commiter, `./release.sh` (build, zip, push, release).
+## Automatic updates
+`UpdateManager` reads the GitHub releases of starbudweiser/mCLEAN (unauthenticated; the user's `gh auth token` is only a fallback if the repository is not readable without it). One request a day, downloads `mCLEAN-X.Y.Z.zip`, checks bundle id, version, `codesign --verify` and that the signing requirement equals the running app's, then `InstallScript` replaces the bundle and relaunches (`open -g`). Setting `autoUpdate` (on by default); otherwise an Install button shows in the panel.
 
-## Commandes
-- Tests : `swift test` (21 tests). App : `./build.sh` → `~/Applications/Home Applications/mCLEAN.app` (signé via `sign_app.sh`).
-- Essais réels : `SELFTEST=1 ./build.sh` puis `build/mCLEAN.app/Contents/MacOS/mCLEAN --selftest status|clean|deep|render <dossier>`.
-- Langues : `tools/strings_table.py` → `python3 tools/gen_strings.py`. Icône : `assets/make_icon.py` (PyQt6, `QT_QPA_PLATFORM=offscreen`).
-- Couleur du logo (« m » du nom) : vert #34D399 (`Brand`).
+Release: bump the version in `Resources/Info.plist`, commit, run `./release.sh` (build, Developer ID signing, notarization, stapling, zip, push, GitHub release). Because updates must keep the same signing requirement, every published build is Developer ID signed; a locally signed build will not auto-update to one.
 
-## Points ouverts
-- Nettoyage profond (`purge`) non testé en réel (mot de passe administrateur requis).
-- Notifications et ouverture à la connexion non testées en réel dans l'app seule.
+## Commands
+- Tests: `swift test` (21 tests). App: `./build.sh` → `~/Applications/Home Applications/mCLEAN.app` (signed through `sign_app.sh`).
+- Real-world checks: `SELFTEST=1 ./build.sh`, then `build/mCLEAN.app/Contents/MacOS/mCLEAN --selftest status|clean|deep|update|login|render <dir>` (`deep` asks for the admin password; `render` writes PNGs of the panel, settings and About).
+- Languages (fr, en, es, it): `tools/strings_table.py` → `python3 tools/gen_strings.py`. Icon: `assets/make_icon.py` (PyQt6, `QT_QPA_PLATFORM=offscreen`).
+- Logo color (the "m" of the name): green #34D399 (`Brand`).
+
+## Open points
+- Deep clean (`purge`) not tested for real (needs the administrator password).
+- Notifications and menu clicks not tested in the installed app.

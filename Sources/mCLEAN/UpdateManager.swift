@@ -20,6 +20,8 @@ final class UpdateManager: ObservableObject {
     private weak var model: AppModel?
     private var timer: Timer?
     private var token: String??
+    /// Dépôt public : aucune authentification. Le jeton `gh` n'est utilisé qu'en repli .
+    private var useToken = false
 
     let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
 
@@ -83,7 +85,7 @@ final class UpdateManager: ObservableObject {
 
     // MARK: Réseau
 
-    /// Jeton GitHub de l'utilisateur (via `gh`) : indispensable tant que le dépôt est privé. Il ne part que vers api.github.com.
+    /// Jeton GitHub de l'utilisateur (via `gh`), seulement si le dépôt n'est pas lisible sans. Il ne part que vers api.github.com.
     private func githubToken() async -> String? {
         if let token { return token }
         let value: String? = await Task.detached {
@@ -102,7 +104,7 @@ final class UpdateManager: ObservableObject {
         var req = URLRequest(url: url, timeoutInterval: 20)
         req.setValue(accept, forHTTPHeaderField: "Accept")
         req.setValue("mCLEAN-updater", forHTTPHeaderField: "User-Agent")
-        if let token = await githubToken() { req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
+        if useToken, let token = await githubToken() { req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
         return req
     }
 
@@ -111,10 +113,18 @@ final class UpdateManager: ObservableObject {
     /// 404 : aucune release publiée, ou dépôt privé sans jeton (alors `gh` n'est pas connecté : c'est un échec).
     private func fetchLatest() async -> Fetch {
         guard let url = URL(string: "https://api.github.com/repos/\(Self.repo)/releases/latest") else { return .failed }
-        let req = await request(url, accept: "application/vnd.github+json")
-        guard let (data, response) = try? await URLSession.shared.data(for: req),
-              let status = (response as? HTTPURLResponse)?.statusCode else { return .failed }
-        if status == 404 { return await githubToken() == nil ? .failed : .noRelease }
+        useToken = false
+        var req = await request(url, accept: "application/vnd.github+json")
+        guard var (data, response) = try? await URLSession.shared.data(for: req),
+              var status = (response as? HTTPURLResponse)?.statusCode else { return .failed }
+        if status == 404, await githubToken() != nil { // dépôt privé, ou aucune release
+            useToken = true
+            req = await request(url, accept: "application/vnd.github+json")
+            guard let (data2, response2) = try? await URLSession.shared.data(for: req),
+                  let status2 = (response2 as? HTTPURLResponse)?.statusCode else { return .failed }
+            data = data2; status = status2
+        }
+        if status == 404 { return .noRelease }
         guard status == 200 else { return .failed }
         return ReleaseParser.parse(data, assetPrefix: "mCLEAN-").map(Fetch.release) ?? .noRelease
     }
