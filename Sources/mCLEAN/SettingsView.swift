@@ -143,10 +143,10 @@ struct SettingsView: View {
             Text(updateStatus).socle(Socle.T.body).foregroundStyle(updateIsError ? Socle.C.danger : Socle.C.text)
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: Socle.M.space2) {
-                Button(L("updates.check")) { model.updater.check() }
+                Button(L("updates.check")) { model.updater.checkNow() }
                     .buttonStyle(SocleButtonStyle(.secondary)).disabled(model.updater.isBusy)
-                if case .available(let release) = model.updater.state {
-                    Button(L("updates.install")) { model.updater.install(release) }.buttonStyle(SocleButtonStyle(.primary))
+                if case .available(let plan) = model.updater.state {
+                    Button(L("updates.install")) { model.updater.present(plan) }.buttonStyle(SocleButtonStyle(.primary))
                 }
             }
         }
@@ -159,10 +159,11 @@ struct SettingsView: View {
         case .idle: L("updates.idle")
         case .checking: L("updates.checking")
         case .upToDate: L("updates.upToDate")
-        case .available(let r): L("updates.available", r.version)
-        case .downloading(let v): L("updates.downloading", v)
+        case .available(let plan): L("updates.available", plan.target.version)
+        case .downloading: L("updates.downloading", model.updater.plan?.target.version ?? "")
+        case .verifying: model.updater.message(for: "verifying")
         case .installing: L("updates.installing")
-        case .failed(let key): L(key)
+        case .failed(let key): model.updater.message(for: key)
         }
     }
 

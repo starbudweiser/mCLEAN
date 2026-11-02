@@ -46,11 +46,11 @@ struct PanelView: View {
     }
 
     @ViewBuilder private var updateBanner: some View {
-        if case .available(let release) = model.updater.state, !model.settings.autoUpdate {
+        if case .available(let plan) = model.updater.state {
             HStack {
-                Text(L("updates.available", release.version)).socle(Socle.T.label).foregroundStyle(Socle.C.textStrong)
+                Text(L("updates.available", plan.target.version)).socle(Socle.T.label).foregroundStyle(Socle.C.textStrong)
                 Spacer()
-                Button(L("updates.install")) { model.updater.install(release) }.buttonStyle(SocleButtonStyle(.primary, height: 26))
+                Button(L("updates.install")) { model.updater.present(plan) }.buttonStyle(SocleButtonStyle(.primary, height: 26))
             }
             .padding(.horizontal, Socle.M.space4).padding(.vertical, Socle.M.space2)
             .background(Socle.C.surfaceSelected)

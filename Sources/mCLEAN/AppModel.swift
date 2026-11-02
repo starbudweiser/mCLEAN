@@ -45,7 +45,7 @@ final class AppModel: ObservableObject {
         }
     }
     var panelOpen = false
-    private(set) lazy var updater = UpdateManager(model: self)
+    let updater = UpdateEngine.shared  // mise à jour automatique commune (_tools/shared/Updater.swift)
     var onChange: (() -> Void)?
 
     private var timer: Timer?
@@ -79,6 +79,9 @@ final class AppModel: ObservableObject {
         }
         scheduleTimer()
         tick()
+        updater.configure(repo: "mCLEAN", lang: { Bundle.main.preferredLocalizations.first ?? "en" })
+        updater.autoCheck = { [weak self] in self?.settings.autoUpdate ?? true }
+        updater.canInstall = { [weak self] in self?.cleaning == nil }
         updater.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
         updater.start()
     }

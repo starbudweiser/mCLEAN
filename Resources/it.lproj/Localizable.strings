@@ -62,8 +62,8 @@
 "settings.addIgnored" = "Aggiungi";
 "menu.checkUpdates" = "Cerca aggiornamenti…";
 "settings.updates" = "Aggiornamenti";
-"updates.auto" = "Installa automaticamente";
-"updates.autoHelp" = "Controlla una volta al giorno l'ultima versione pubblicata su GitHub, la scarica, verifica la firma, poi sostituisce l'app e la riavvia. Mai durante una pulizia.";
+"updates.auto" = "Verifica automaticamente";
+"updates.autoHelp" = "Controlla una volta al giorno l'ultima versione pubblicata su GitHub e mostra le novità prima di scaricare qualsiasi cosa. Non viene installato nulla senza la tua approvazione.";
 "updates.current" = "Versione installata: %@";
 "updates.check" = "Cerca ora";
 "updates.install" = "Installa";
@@ -73,10 +73,6 @@
 "updates.available" = "Versione %@ disponibile";
 "updates.downloading" = "Download della versione %@…";
 "updates.installing" = "Installazione, l'app verrà riavviata…";
-"updates.errNetwork" = "Errore: connessione assente o repository non raggiungibile.";
-"updates.errVerify" = "Errore: l'aggiornamento non ha superato la verifica della firma.";
-"updates.errInstall" = "Errore: impossibile sostituire l'app nella sua cartella.";
-"updates.errBusy" = "Pulizia in corso, riprova dopo.";
 "about.menu" = "Informazioni su mCLEAN";
 "about.tagline" = "Controlla la memoria del Mac dalla barra dei menu e la libera con un clic.";
 "about.version" = "Versione %@ (%@)";

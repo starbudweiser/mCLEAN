@@ -1,7 +1,7 @@
 #!/bin/bash
 # Publie la version courante (Resources/Info.plist) : compile, signe Developer ID, notarise, agrafe, archive,
-# crée la release GitHub vX.Y.Z. L'appli installée se met à jour toute seule depuis cette release (UpdateManager).
-# Usage : ./release.sh   (NOTES="…" pour le texte de la release)
+# crée la release GitHub vX.Y.Z. L'appli installée se met à jour toute seule depuis cette release (Updater.swift commun, _tools/shared).
+# Usage : ./release.sh   (notes : _tools/changelogs/mCLEAN_<version>.txt, 4 langues obligatoires)
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -15,7 +15,9 @@ INSTALL_DIR="$WORK/build" ./build.sh
 DIST="$WORK/notarized" /Volumes/SKYRIM/TOOLS/MAC/_tools/notarize_app.sh "$WORK/build/mCLEAN.app"
 ZIP="$WORK/mCLEAN-$VERSION.zip"
 /usr/bin/ditto -c -k --keepParent "$WORK/notarized/mCLEAN.app" "$ZIP"
+(cd "$WORK" && shasum -a 256 "$(basename "$ZIP")" > "$(basename "$ZIP").sha256")
+python3 /Volumes/SKYRIM/TOOLS/MAC/_tools/release_notes.py mCLEAN "$VERSION" --sha "$ZIP.sha256" -o "$WORK/notes.md"
 git push origin main
-gh release create "$TAG" "$ZIP" --title "mCLEAN $VERSION" --notes "${NOTES:-Version $VERSION}"
+gh release create "$TAG" "$ZIP" "$ZIP.sha256" --title "mCLEAN $VERSION" --notes-file "$WORK/notes.md"
 rm -rf "$WORK"
 echo "OK : release $TAG publiée"
