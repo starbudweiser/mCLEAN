@@ -33,7 +33,8 @@ final class StatusController: NSObject, NSMenuDelegate {
     init(model: AppModel) {
         self.model = model
         super.init()
-        let hosting = NSHostingController(rootView: PanelView(onMenu: { [weak self] view in self?.showMenu(from: view) }).environmentObject(model))
+        // Roue du panneau : préférences directement ; clic droit sur l'icône : menu complet.
+        let hosting = NSHostingController(rootView: PanelView(onMenu: { [weak self] _ in self?.openSettings() }).environmentObject(model))
         hosting.sizingOptions = .preferredContentSize
         popover.contentViewController = hosting
         popover.behavior = .transient
@@ -74,6 +75,7 @@ final class StatusController: NSObject, NSMenuDelegate {
             model.refreshApps()
             NSApp.activate()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            popover.contentViewController?.view.window?.makeKey() // sinon le premier clic dans le panneau ne fait que l'activer
         }
     }
 

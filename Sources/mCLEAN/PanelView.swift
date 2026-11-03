@@ -185,6 +185,11 @@ struct PanelView: View {
 }
 
 /// Bouton de menu : garde sa vue AppKit pour y ancrer le menu contextuel.
+/// Bouton qui agit dès le premier clic, même si le panneau n'est pas encore la fenêtre active.
+private final class FirstClickButton: NSButton {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+}
+
 private struct MenuAnchor: NSViewRepresentable {
     let onMenu: (NSView) -> Void
 
@@ -197,7 +202,7 @@ private struct MenuAnchor: NSViewRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator(onMenu: onMenu) }
 
     func makeNSView(context: Context) -> NSButton {
-        let button = NSButton(image: NSImage(systemSymbolName: "gearshape", accessibilityDescription: L("menu.settings")) ?? NSImage(),
+        let button = FirstClickButton(image: NSImage(systemSymbolName: "gearshape", accessibilityDescription: L("menu.settings")) ?? NSImage(),
                               target: context.coordinator, action: #selector(Coordinator.clicked))
         button.isBordered = false
         button.contentTintColor = NSColor(Socle.C.action) // jaune Socle
