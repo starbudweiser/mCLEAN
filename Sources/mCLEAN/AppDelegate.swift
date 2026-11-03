@@ -128,8 +128,10 @@ final class StatusController: NSObject, NSMenuDelegate {
         let text = s.showPercent ? MemoryFormat.percent(snapshot.usedFraction) : MemoryFormat.size(snapshot.available)
         button.title = s.statusDisplay == .iconOnly ? "" : text
         button.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
-        button.imagePosition = s.statusDisplay == .textOnly ? .noImage : .imageLeading
-        button.image = StatusIcon.image(fraction: snapshot.usedFraction, pressure: snapshot.pressure, spinning: model.cleaning != nil, angle: angle)
+        // .noImage ne suffit pas : la barre de menus affichait quand même l'image (et rien d'autre). On la retire.
+        button.imagePosition = s.statusDisplay == .textOnly ? .noImage : s.statusDisplay == .iconOnly ? .imageOnly : .imageLeading
+        button.image = s.statusDisplay == .textOnly ? nil
+            : StatusIcon.image(fraction: snapshot.usedFraction, pressure: snapshot.pressure, spinning: model.cleaning != nil, angle: angle)
 
         if model.cleaning != nil, spinner == nil {
             spinner = Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { [weak self] _ in
