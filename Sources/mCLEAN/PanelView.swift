@@ -134,12 +134,29 @@ struct PanelView: View {
                     Spacer()
                     Text(MemoryFormat.size(app.bytes)).socle(Socle.T.monoSm).foregroundStyle(Socle.C.textMuted)
                     if inactive {
+                        // Largeur fixe : le style Socle s'étire (maxWidth .infinity) et décalait les boutons d'une ligne à l'autre.
                         Button(L("action.quit")) { model.quit(app) }
-                            .buttonStyle(SocleButtonStyle(.tertiary, height: 24))
+                            .buttonStyle(QuitButtonStyle())
+                            .frame(width: 76)
                             .help(L("inactive.since", since(app.lastActive)))
                     }
                 }
             }
+        }
+    }
+
+    /// Bouton « Quitter » rouge sombre (fond danger-bg de Socle).
+    private struct QuitButtonStyle: ButtonStyle {
+        @State private var hover = false
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .socle(Socle.T.button)
+                .foregroundStyle(Socle.C.dangerSoft)
+                .frame(maxWidth: .infinity, minHeight: 24)
+                .background(Socle.C.dangerBg.opacity(configuration.isPressed ? 0.7 : 1), in: RoundedRectangle(cornerRadius: Socle.M.radius))
+                .overlay(RoundedRectangle(cornerRadius: Socle.M.radius).stroke(Socle.C.dangerBorder.opacity(hover ? 0.8 : 0.35)))
+                .contentShape(Rectangle())
+                .onHover { hover = $0 }
         }
     }
 
