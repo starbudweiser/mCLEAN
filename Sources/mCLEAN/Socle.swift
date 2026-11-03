@@ -540,3 +540,34 @@ struct SocleButtonStyle: ButtonStyle {
         }
     }
 }
+
+extension NSWindow {
+    /// Centre exactement la fenêtre sur l'écran du pointeur, dans sa zone utile (`center()` de macOS la place au-dessus du centre).
+    @MainActor func socleCenter() {
+        let pointeur = NSEvent.mouseLocation
+        let ecran = NSScreen.screens.first { NSMouseInRect(pointeur, $0.frame, false) } ?? screen ?? NSScreen.main
+        guard let zone = ecran?.visibleFrame else { return }
+        setFrameOrigin(NSPoint(x: zone.midX - frame.width / 2, y: zone.midY - frame.height / 2))
+    }
+}
+
+extension View {
+    /// Filigrane de la colonne de gauche : motif de l'icône de l'appli, d'une seule teinte, derrière le contenu.
+    /// À poser avant le `.background` de la colonne. Il déborde du bas et de la droite, et ne capte aucun clic.
+    func socleWatermark<Mark: View>(@ViewBuilder _ mark: () -> Mark) -> some View {
+        let mark = mark()
+        return background {
+            GeometryReader { zone in
+                let side = zone.size.width * 1.3
+                mark
+                    .frame(width: side, height: side)
+                    .foregroundStyle(Socle.C.textStrong)
+                    .opacity(0.05)
+                    .position(x: zone.size.width * 0.62, y: zone.size.height - side * 0.38)
+            }
+            .clipped()
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
+    }
+}

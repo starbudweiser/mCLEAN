@@ -5,7 +5,6 @@
 "unit.seconds" = "%ld s";
 "unit.minutes" = "%ld min";
 "unit.hours" = "%ld h";
-"status.tooltip" = "%@ disponibles";
 "menu.settings" = "Ajustes…";
 "menu.quit" = "Salir";
 "panel.available" = "disponibles";
@@ -62,8 +61,8 @@
 "settings.addIgnored" = "Añadir";
 "menu.checkUpdates" = "Buscar actualizaciones…";
 "settings.updates" = "Actualizaciones";
-"updates.auto" = "Buscar automáticamente";
-"updates.autoHelp" = "Busca una vez al día la última versión publicada en GitHub y muestra sus novedades antes de descargar nada. No se instala nada sin tu aprobación.";
+"updates.auto" = "Instalar automáticamente";
+"updates.autoHelp" = "Busca una vez al día la última versión publicada en GitHub, la descarga, comprueba su firma y reemplaza la app y la reinicia. Nunca durante una limpieza.";
 "updates.current" = "Versión instalada: %@";
 "updates.check" = "Buscar ahora";
 "updates.install" = "Instalar";
@@ -73,6 +72,10 @@
 "updates.available" = "Versión %@ disponible";
 "updates.downloading" = "Descargando la versión %@…";
 "updates.installing" = "Instalando, la app se reiniciará…";
+"updates.errNetwork" = "Error: sin conexión o repositorio inaccesible.";
+"updates.errVerify" = "Error: la actualización no superó la verificación de firma.";
+"updates.errInstall" = "Error: no se pudo reemplazar la app en su carpeta.";
+"updates.errBusy" = "Hay una limpieza en curso, inténtalo después.";
 "about.menu" = "Acerca de mCLEAN";
 "about.tagline" = "Vigila la memoria del Mac desde la barra de menús y la libera con un clic.";
 "about.version" = "Versión %@ (%@)";

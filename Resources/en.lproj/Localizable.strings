@@ -5,7 +5,6 @@
 "unit.seconds" = "%ld s";
 "unit.minutes" = "%ld min";
 "unit.hours" = "%ld h";
-"status.tooltip" = "%@ available";
 "menu.settings" = "Settings…";
 "menu.quit" = "Quit";
 "panel.available" = "available";
@@ -62,8 +61,8 @@
 "settings.addIgnored" = "Add";
 "menu.checkUpdates" = "Check for updates…";
 "settings.updates" = "Updates";
-"updates.auto" = "Check automatically";
-"updates.autoHelp" = "Checks once a day for the latest version published on GitHub and shows what it brings before anything is downloaded. Nothing is installed without your approval.";
+"updates.auto" = "Install automatically";
+"updates.autoHelp" = "Checks once a day for the latest version published on GitHub, downloads it, verifies its signature, then replaces the app and relaunches it. Never during a clean.";
 "updates.current" = "Installed version: %@";
 "updates.check" = "Check now";
 "updates.install" = "Install";
@@ -73,6 +72,10 @@
 "updates.available" = "Version %@ available";
 "updates.downloading" = "Downloading version %@…";
 "updates.installing" = "Installing, the app will restart…";
+"updates.errNetwork" = "Failed: no connection or repository unreachable.";
+"updates.errVerify" = "Failed: the update did not pass signature verification.";
+"updates.errInstall" = "Failed: could not replace the app in its folder.";
+"updates.errBusy" = "A clean is running, try again afterwards.";
 "about.menu" = "About mCLEAN";
 "about.tagline" = "Monitors your Mac's memory from the menu bar and frees it in one click.";
 "about.version" = "Version %@ (%@)";

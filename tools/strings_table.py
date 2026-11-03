@@ -9,7 +9,6 @@ T = [
 ("unit.minutes", "%ld min", "%ld min", "%ld min", "%ld min"),
 ("unit.hours", "%ld h", "%ld h", "%ld h", "%ld h"),
 # --- barre de menus
-("status.tooltip", "%@ disponibles", "%@ available", "%@ disponibles", "%@ disponibili"),
 ("menu.settings", "Réglages…", "Settings…", "Ajustes…", "Impostazioni…"),
 ("menu.quit", "Quitter", "Quit", "Salir", "Esci"),
 # --- panneau

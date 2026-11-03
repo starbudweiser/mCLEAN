@@ -50,6 +50,19 @@ final class StatusController: NSObject, NSMenuDelegate {
         render()
     }
 
+    #if MCLEAN_SELFTEST
+    /// Essai : ouvre le panneau (rendu invisible) et renvoie les cadres de l'icône et du panneau.
+    func probe() -> (button: NSRect?, screen: NSRect?, popover: NSRect?) {
+        guard let button = item.button, let window = button.window else { return (nil, nil, nil) }
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        popover.contentViewController?.view.window?.alphaValue = 0
+        RunLoop.main.run(until: Date().addingTimeInterval(0.5))
+        let frame = popover.contentViewController?.view.window?.frame
+        popover.performClose(nil)
+        return (window.frame, window.screen?.frame, frame)
+    }
+    #endif
+
     @objc private func clicked() {
         guard let button = item.button else { return }
         if NSApp.currentEvent?.type == .rightMouseUp {
@@ -106,7 +119,6 @@ final class StatusController: NSObject, NSMenuDelegate {
         button.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
         button.imagePosition = s.statusDisplay == .textOnly ? .noImage : .imageLeading
         button.image = StatusIcon.image(fraction: snapshot.usedFraction, pressure: snapshot.pressure, spinning: model.cleaning != nil, angle: angle)
-        button.toolTip = L("status.tooltip", MemoryFormat.size(snapshot.available))
 
         if model.cleaning != nil, spinner == nil {
             spinner = Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { [weak self] _ in

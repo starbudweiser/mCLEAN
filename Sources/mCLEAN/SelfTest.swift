@@ -14,6 +14,7 @@ enum SelfTest {
         case "deep": clean(.deep)
         case "update": update()
         case "login": login()
+        case "popover": popover()
         case "render": render(to: URL(fileURLWithPath: args[i + 2]))
         default: print("commande inconnue")
         }
@@ -52,6 +53,22 @@ enum SelfTest {
         guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return }
         host.cacheDisplay(in: host.bounds, to: rep)
         try? rep.representation(using: .png, properties: [:])?.write(to: url)
+    }
+
+    /// Position du panneau par rapport à l'icône de la barre de menus.
+    private static func popover() {
+        let app = NSApplication.shared
+        app.setActivationPolicy(.accessory)
+        app.finishLaunching()
+        Socle.apply(.dark)
+        let model = AppModel()
+        let status = StatusController(model: model)
+        RunLoop.main.run(until: Date().addingTimeInterval(1.5))
+        let r = status.probe()
+        for screen in NSScreen.screens { print("écran :", screen.frame) }
+        print("icône :", r.button.map { "\($0)" } ?? "?", "sur écran", r.screen.map { "\($0)" } ?? "?")
+        print("panneau :", r.popover.map { "\($0)" } ?? "?")
+        if let b = r.button, let p = r.popover { print("centre icône x =", b.midX, " centre panneau x =", p.midX, " écart =", p.midX - b.midX) }
     }
 
     /// Active puis désactive l'ouverture à la connexion (sans laisser de trace).
