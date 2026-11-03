@@ -62,6 +62,9 @@ final class StatusController: NSObject, NSMenuDelegate {
         popover.performClose(nil)
         return (window.frame, window.screen?.frame, frame)
     }
+
+    /// Essai : cadre qu'aurait la fenêtre des réglages (jamais affichée).
+    func probeSettings() -> NSRect { SettingsWindow.make(model: model, tab: nil, below: anchor).frame }
     #endif
 
     @objc private func clicked() {
@@ -96,13 +99,19 @@ final class StatusController: NSObject, NSMenuDelegate {
 
     @objc private func openSettings() {
         popover.performClose(nil)
-        DispatchQueue.main.async { [model] in SettingsWindow.show(model: model) } // après la fermeture du panneau
+        DispatchQueue.main.async { [model, anchor] in SettingsWindow.show(model: model, below: anchor) } // après la fermeture du panneau
     }
 
     @objc private func checkUpdates() {
         popover.performClose(nil)
         model.updater.check()
-        DispatchQueue.main.async { [model] in SettingsWindow.show(model: model, tab: .updates) }
+        DispatchQueue.main.async { [model, anchor] in SettingsWindow.show(model: model, tab: .updates, below: anchor) }
+    }
+
+    /// Cadre de l'icône dans la barre de menus, en coordonnées écran.
+    private var anchor: NSRect? {
+        guard let button = item.button, let window = button.window else { return nil }
+        return window.convertToScreen(button.convert(button.bounds, to: nil))
     }
 
     @objc private func openAbout() {

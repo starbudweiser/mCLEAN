@@ -69,6 +69,9 @@ enum SelfTest {
         print("icône :", r.button.map { "\($0)" } ?? "?", "sur écran", r.screen.map { "\($0)" } ?? "?")
         print("panneau :", r.popover.map { "\($0)" } ?? "?")
         if let b = r.button, let p = r.popover { print("centre icône x =", b.midX, " centre panneau x =", p.midX, " écart =", p.midX - b.midX) }
+        let s = status.probeSettings()
+        print("réglages :", s)
+        if let b = r.button { print("réglages : écart centre x =", s.midX - b.midX, " haut sous l'icône de", b.minY - s.maxY) }
     }
 
     /// Active puis désactive l'ouverture à la connexion (sans laisser de trace).

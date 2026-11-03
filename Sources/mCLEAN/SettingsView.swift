@@ -20,21 +20,35 @@ enum SettingsWindow {
 
     static var requestedTab: SettingsTab?
 
-    static func show(model: AppModel, tab: SettingsTab? = nil) {
+    /// `below` : cadre écran de l'icône de la barre de menus ; la fenêtre s'ouvre centrée juste en dessous.
+    static func show(model: AppModel, tab: SettingsTab? = nil, below anchor: NSRect? = nil) {
         requestedTab = tab
         window?.close()
-        window = nil
-        do {
-            let hosting = NSHostingController(rootView: SettingsView(tab: tab ?? .general).environmentObject(model))
-            hosting.sizingOptions = .preferredContentSize
-            let w = NSWindow(contentViewController: hosting)
-            w.styleMask = [.titled, .closable]
-            w.title = L("menu.settings")
-            w.isReleasedWhenClosed = false
-            w.center()
-            window = w
-        }
+        window = make(model: model, tab: tab, below: anchor)
         window?.present()
+    }
+
+    /// Fenêtre prête à afficher, déjà placée (aussi utilisée par l'essai de position, sans l'afficher).
+    static func make(model: AppModel, tab: SettingsTab?, below anchor: NSRect?) -> NSWindow {
+        let hosting = NSHostingController(rootView: SettingsView(tab: tab ?? .general).environmentObject(model))
+        hosting.sizingOptions = .preferredContentSize
+        let w = NSWindow(contentViewController: hosting)
+        w.styleMask = [.titled, .closable]
+        w.title = L("menu.settings")
+        w.isReleasedWhenClosed = false
+        w.setContentSize(hosting.view.fittingSize) // taille réelle avant le placement (sinon 1×1 jusqu'à l'affichage)
+        w.center()
+        if let anchor { place(w, below: anchor) }
+        return w
+    }
+
+    private static func place(_ w: NSWindow, below anchor: NSRect) {
+        guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(anchor) }) ?? NSScreen.main else { return }
+        let visible = screen.visibleFrame
+        let size = w.frame.size
+        let margin: CGFloat = 8
+        let x = min(max(anchor.midX - size.width / 2, visible.minX + margin), visible.maxX - size.width - margin)
+        w.setFrameTopLeftPoint(NSPoint(x: x, y: min(anchor.minY, visible.maxY) - 4))
     }
 }
 
