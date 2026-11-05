@@ -43,12 +43,21 @@ public enum MemoryProbe {
 
     /// Empreinte mémoire de chaque processus lisible, cumulée sur son processus responsable.
     public static func footprintsByResponsiblePID() -> [pid_t: UInt64] {
+        var totals: [pid_t: UInt64] = [:]
+        for s in processSamples() { totals[s.group, default: 0] += s.footprint }
+        return totals
+    }
+
+    /// Empreinte mémoire et temps processeur de chaque processus lisible.
+    public static func processSamples() -> [ProcessSample] {
         let capacity = proc_listallpids(nil, 0) + 64
-        guard capacity > 64 else { return [:] }
+        guard capacity > 64 else { return [] }
         var pids = [pid_t](repeating: 0, count: Int(capacity))
         let count = proc_listallpids(&pids, capacity * Int32(MemoryLayout<pid_t>.size))
-        guard count > 0 else { return [:] }
-        var totals: [pid_t: UInt64] = [:]
+        guard count > 0 else { return [] }
+        var base = mach_timebase_info_data_t()
+        mach_timebase_info(&base)
+        var samples: [ProcessSample] = []
         for pid in pids.prefix(Int(count)) where pid > 0 {
             var usage = rusage_info_v4()
             let result = withUnsafeMutablePointer(to: &usage) {
@@ -58,8 +67,10 @@ public enum MemoryProbe {
             }
             guard result == 0 else { continue } // processus d'un autre utilisateur, ou déjà terminé
             let owner = responsiblePID(pid)
-            totals[owner > 0 ? owner : pid, default: 0] += usage.ri_phys_footprint
+            let ticks = usage.ri_user_time &+ usage.ri_system_time
+            let nanos = base.denom == 0 ? ticks : ticks * UInt64(base.numer) / UInt64(base.denom)
+            samples.append(ProcessSample(pid: pid, group: owner > 0 ? owner : pid, footprint: usage.ri_phys_footprint, cpuNanos: nanos))
         }
-        return totals
+        return samples
     }
 }

@@ -30,6 +30,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var history: [Double] = []
     @Published private(set) var hogs: [AppUsage] = []
     @Published private(set) var inactive: [AppUsage] = []
+    /// Toutes les applis inactives (le panneau n'en montre que quelques-unes), les plus lourdes d'abord.
+    private(set) var idleApps: [AppUsage] = []
     @Published private(set) var cleaning: CleanKind?
     @Published private(set) var progress = 0.0
     @Published private(set) var lastResult: CleanResult?
@@ -56,6 +58,7 @@ final class AppModel: ObservableObject {
     private var notified = Set<String>()
     private var activation: NSObjectProtocol?
     private var bag = Set<AnyCancellable>()
+    private(set) lazy var guardian = Guardian(model: self)
 
     init() {
         snapshot = MemoryProbe.snapshot() ?? MemorySnapshot(
@@ -79,6 +82,7 @@ final class AppModel: ObservableObject {
         }
         scheduleTimer()
         tick()
+        guardian.start()
         updater.configure(repo: "mCLEAN", lang: { Bundle.main.preferredLocalizations.first ?? "en" })
         updater.autoCheck = { [weak self] in self?.settings.autoUpdate ?? true }
         updater.canInstall = { [weak self] in self?.cleaning == nil }
@@ -142,6 +146,7 @@ final class AppModel: ObservableObject {
             isInactive(AppActivity(bundleID: $0.bundleID, lastActive: $0.lastActive), hours: settings.inactiveHours,
                        ignored: settings.ignoredBundleIDs, frontmost: frontmost, now: now)
         }
+        idleApps = idle
         inactive = settings.showInactive ? Array(idle.prefix(Self.appCount)) : []
         if settings.notifyInactive {
             for app in idle where app.bytes >= Self.notifyMinimum && !notified.contains(app.bundleID) {

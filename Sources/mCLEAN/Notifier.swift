@@ -43,6 +43,16 @@ final class Notifier: NSObject, UNUserNotificationCenterDelegate {
              category: Self.inactiveCategory, info: ["bundleID": app.bundleID])
     }
 
+    /// Alerte du garde-fou ; avec `bundleID`, le bouton « Quitter » est proposé.
+    func guardAlert(id: String, title: String, body: String, bundleID: String?) {
+        send(id: "guard.\(id)", title: title, body: body, category: bundleID == nil ? "" : Self.inactiveCategory,
+             info: bundleID.map { ["bundleID": $0] } ?? [:])
+    }
+
+    func guardQuit(app: AppUsage) {
+        send(id: "guard.quit.\(app.bundleID)", title: L("notify.guardQuitTitle", app.name), body: L("notify.guardQuitBody", MemoryFormat.size(app.bytes)))
+    }
+
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
                                             withCompletionHandler completionHandler: @escaping () -> Void) {
         let action = response.actionIdentifier

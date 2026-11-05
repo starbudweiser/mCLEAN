@@ -24,6 +24,9 @@ public struct AppSettings: Codable, Equatable {
     public var inactiveHours = 3
     public var ignoredBundleIDs: [String] = []
     public var autoUpdate = true
+    public var guardEnabled = true
+    public var guardAutoQuit = false
+    public var guardCPU = true
 
     public init() {}
 
@@ -44,6 +47,9 @@ public struct AppSettings: Codable, Equatable {
         inactiveHours = (try? c.decode(Int.self, forKey: .inactiveHours)) ?? d.inactiveHours
         ignoredBundleIDs = (try? c.decode([String].self, forKey: .ignoredBundleIDs)) ?? d.ignoredBundleIDs
         autoUpdate = (try? c.decode(Bool.self, forKey: .autoUpdate)) ?? d.autoUpdate
+        guardEnabled = (try? c.decode(Bool.self, forKey: .guardEnabled)) ?? d.guardEnabled
+        guardAutoQuit = (try? c.decode(Bool.self, forKey: .guardAutoQuit)) ?? d.guardAutoQuit
+        guardCPU = (try? c.decode(Bool.self, forKey: .guardCPU)) ?? d.guardCPU
     }
 
     /// Ramène les valeurs dans les plages de l'interface.

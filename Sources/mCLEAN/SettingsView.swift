@@ -69,7 +69,7 @@ struct SettingsView: View {
             Spacer(minLength: 0)
         }
         .padding(Socle.M.space5)
-        .frame(width: 440, height: 400, alignment: .topLeading)
+        .frame(width: 440, height: 470, alignment: .topLeading)
         .background(Socle.C.bg)
         .toggleStyle(.switch)
         .tint(Socle.C.accentFill)
@@ -146,6 +146,14 @@ struct SettingsView: View {
             slider(L("settings.cooldown"), value: L("unit.minutes", model.settings.cooldownMinutes),
                    intBinding(\.cooldownMinutes), 5...120, step: 5)
             toggle(L("settings.notifyClean"), $model.settings.notifyClean)
+            Divider().overlay(Socle.C.border)
+            toggle(L("settings.guard"), $model.settings.guardEnabled)
+            Text(L("settings.guardHelp")).socle(Socle.T.meta).foregroundStyle(Socle.C.textMuted).fixedSize(horizontal: false, vertical: true)
+            Group {
+                toggle(L("settings.guardCPU"), $model.settings.guardCPU)
+                toggle(L("settings.guardAutoQuit"), $model.settings.guardAutoQuit)
+            }
+            .disabled(!model.settings.guardEnabled)
         }
     }
 

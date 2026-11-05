@@ -15,6 +15,7 @@ enum SelfTest {
         case "update": update()
         case "login": login()
         case "popover": popover()
+        case "guard": guardCheck()
         case "render": render(to: URL(fileURLWithPath: args[i + 2]))
         default: print("commande inconnue")
         }
@@ -74,6 +75,30 @@ enum SelfTest {
         if let b = r.button { print("réglages : écart centre x =", s.midX - b.midX, " haut sous l'icône de", b.minY - s.maxY) }
     }
 
+    /// Niveau actuel, puis un processus qui tourne à vide ~10 s : le suivi doit le repérer et sa priorité doit pouvoir être baissée.
+    private static func guardCheck() {
+        guard let snap = MemoryProbe.snapshot() else { return print("relevé impossible") }
+        print("niveau :", guardLevel(snap), "disponible :", MemoryFormat.size(snap.available), "pression :", snap.pressure)
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/bin/sh")
+        task.arguments = ["-c", "while :; do :; done"]
+        try? task.run()
+        defer { task.terminate() }
+        var tracker = GuardTracker()
+        tracker.cpuSustain = 4
+        let pid = task.processIdentifier
+        var found = false
+        for i in 0..<6 {
+            let findings = tracker.ingest(MemoryProbe.processSamples(), now: Date())
+            if findings.cpuHogs.contains(pid) { found = true }
+            print("relevé", i, "hogs :", findings.cpuHogs.count, found ? "(processus d'essai repéré)" : "")
+            RunLoop.main.run(until: Date().addingTimeInterval(2))
+        }
+        let before = getpriority(PRIO_PROCESS, id_t(pid))
+        let ok = setpriority(PRIO_PROCESS, id_t(pid), 10) == 0
+        print("repéré :", found, " priorité", before, "->", getpriority(PRIO_PROCESS, id_t(pid)), "ok :", ok)
+    }
+
     /// Active puis désactive l'ouverture à la connexion (sans laisser de trace).
     private static func login() {
         print("avant :", LoginItem.enabled)
@@ -102,7 +127,7 @@ enum SelfTest {
         RunLoop.main.run(until: Date().addingTimeInterval(1.5))
         save(PanelView(onMenu: { _ in }).environmentObject(model), size: nil, to: dir.appendingPathComponent("panel.png"))
         for tab in SettingsTab.allCases {
-            save(SettingsView(tab: tab).environmentObject(model), size: NSSize(width: 440, height: 400), to: dir.appendingPathComponent("settings-\(tab.rawValue).png"))
+            save(SettingsView(tab: tab).environmentObject(model), size: NSSize(width: 440, height: 470), to: dir.appendingPathComponent("settings-\(tab.rawValue).png"))
         }
         let about = About.makeWindow()
         about.appearance = NSAppearance(named: .darkAqua)
