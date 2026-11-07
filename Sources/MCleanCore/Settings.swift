@@ -68,9 +68,17 @@ public struct AppSettings: Codable, Equatable {
     }
 }
 
-/// Faut-il lancer le nettoyage automatique ? Jamais sous pression : c'est le système qui libère alors la mémoire.
-public func shouldAutoClean(settings: AppSettings, snapshot: MemorySnapshot, lastRun: Date?, now: Date, busy: Bool) -> Bool {
+/// Délai d'inactivité de l'utilisateur au-delà duquel on ne nettoie plus : sans lui, nettoyer ne fait que repousser en swap la mémoire des applis endormies.
+public let autoCleanMaxIdle: TimeInterval = 20 * 60
+/// Calme exigé après la dernière alerte du garde-fou avant de relancer un nettoyage.
+public let autoCleanCalmNeeded: TimeInterval = 10 * 60
+
+/// Faut-il lancer le nettoyage automatique ? Jamais sous pression (c'est le système qui libère alors la mémoire),
+/// jamais juste après une alerte, jamais pendant que l'utilisateur est absent.
+public func shouldAutoClean(settings: AppSettings, snapshot: MemorySnapshot, lastRun: Date?, now: Date, busy: Bool,
+                            calmFor: TimeInterval = .infinity, userIdle: TimeInterval = 0) -> Bool {
     guard settings.autoClean, !busy, snapshot.pressure == .normal else { return false }
+    guard calmFor >= autoCleanCalmNeeded, userIdle < autoCleanMaxIdle else { return false }
     guard Double(snapshot.available) < settings.thresholdGB * 1_073_741_824 else { return false }
     guard let lastRun else { return true }
     return now.timeIntervalSince(lastRun) >= Double(settings.cooldownMinutes) * 60

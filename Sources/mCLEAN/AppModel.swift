@@ -83,6 +83,8 @@ final class AppModel: ObservableObject {
         scheduleTimer()
         tick()
         guardian.start()
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        Journal.write("démarrage", "v\(version), \(Journal.summary(snapshot))")
         updater.configure(repo: "mCLEAN", lang: { Bundle.main.preferredLocalizations.first ?? "en" })
         updater.autoCheck = { [weak self] in self?.settings.autoUpdate ?? true }
         updater.canInstall = { [weak self] in self?.cleaning == nil }
@@ -114,8 +116,11 @@ final class AppModel: ObservableObject {
         ticks += 1
         // Le détail par appli coûte plus cher : au rythme du relevé panneau ouvert, sinon toutes les minutes.
         if panelOpen || ticks * settings.refreshSeconds % 60 < settings.refreshSeconds { refreshApps() }
-        if shouldAutoClean(settings: settings, snapshot: now, lastRun: lastAutoClean, now: Date(), busy: cleaning != nil) {
+        let idle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: CGEventType(rawValue: ~0)!)
+        if shouldAutoClean(settings: settings, snapshot: now, lastRun: lastAutoClean, now: Date(), busy: cleaning != nil,
+                           calmFor: guardian.calmFor, userIdle: idle) {
             lastAutoClean = Date()
+            Journal.write("nettoyage auto", Journal.summary(now))
             clean(.standard)
         }
         onChange?()
@@ -198,6 +203,7 @@ final class AppModel: ObservableObject {
         cancelFlag = nil
         lastResult = result
         if let result {
+            Journal.write("nettoyage \(result.kind.rawValue) terminé", "libéré \(MemoryFormat.size(result.freed)), arrêt \(result.stop.rawValue), \(Journal.summary(result.after))")
             Log.app.info("Nettoyage \(result.kind.rawValue, privacy: .public) : \(result.freed) octets, arrêt \(result.stop.rawValue, privacy: .public)")
             if settings.notifyClean, result.stop != .cancelled { Notifier.shared.cleaned(result) }
         }

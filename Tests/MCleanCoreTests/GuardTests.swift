@@ -96,4 +96,13 @@ final class GuardTests: XCTestCase {
         XCTAssertTrue(s.guardCPU)
         XCTAssertFalse(s.guardAutoQuit) // jamais d'arrêt d'appli sans accord explicite
     }
+
+    func testAutoCleanWaitsAfterAnAlertAndSkipsWhenUserIsAway() {
+        var s = AppSettings(); s.autoClean = true; s.thresholdGB = 40
+        let low = snapshot(used: 50)
+        let now = Date()
+        XCTAssertTrue(shouldAutoClean(settings: s, snapshot: low, lastRun: nil, now: now, busy: false, calmFor: .infinity, userIdle: 60))
+        XCTAssertFalse(shouldAutoClean(settings: s, snapshot: low, lastRun: nil, now: now, busy: false, calmFor: 120, userIdle: 60))
+        XCTAssertFalse(shouldAutoClean(settings: s, snapshot: low, lastRun: nil, now: now, busy: false, calmFor: .infinity, userIdle: 3 * 3600))
+    }
 }

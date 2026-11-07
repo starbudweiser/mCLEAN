@@ -23,6 +23,10 @@ final class Guardian {
     private var notified: [String: Date] = [:]
     private var throttled = Set<pid_t>()
     private(set) var level = GuardLevel.ok
+    private var lastAlert = Date.distantPast
+    private var lastBeat = Date()
+    /// Durée écoulée depuis la dernière alerte (infinie s'il n'y en a pas eu depuis le lancement).
+    var calmFor: TimeInterval { level > .ok ? 0 : (lastAlert == .distantPast ? .infinity : Date().timeIntervalSince(lastAlert)) }
 
     init(model: AppModel) { self.model = model }
 
@@ -35,7 +39,14 @@ final class Guardian {
 
     private func check() {
         guard model.settings.guardEnabled, let snapshot = MemoryProbe.snapshot() else { level = .ok; return }
-        level = guardLevel(snapshot)
+        let newLevel = guardLevel(snapshot)
+        if newLevel != level { Journal.write("niveau \(level) -> \(newLevel)", Journal.summary(snapshot)) }
+        level = newLevel
+        if level > .ok { lastAlert = Date() }
+        if Date().timeIntervalSince(lastBeat) >= 300 {
+            lastBeat = Date()
+            Journal.write("point", "\(Journal.summary(snapshot)), gourmands : " + model.hogs.prefix(3).map { "\($0.name) \(MemoryFormat.size($0.bytes))" }.joined(separator: ", "))
+        }
         var load = [Double](repeating: 0, count: 1)
         let saturated = getloadavg(&load, 1) == 1 && cpuSaturated(load1: load[0], cores: ProcessInfo.processInfo.activeProcessorCount)
         let stressed = level > .ok || saturated
@@ -64,6 +75,7 @@ final class Guardian {
                 guard getpriority(PRIO_PROCESS, id_t(pid)) < 10, setpriority(PRIO_PROCESS, id_t(pid), 10) == 0 else { continue }
                 throttled.insert(pid)
                 let name = displayName(group)
+                Journal.write("priorité baissée", "\(name) (pid \(pid))")
                 Log.app.info("Garde-fou : priorité baissée pour \(name, privacy: .public) (pid \(pid))")
                 notify(key: "cpu.\(group)", title: L("notify.guardCPUTitle", name), body: L("notify.guardCPUBody"))
             }
@@ -86,6 +98,7 @@ final class Guardian {
            let victim = model.idleApps.first(where: { $0.bytes >= Self.quitMinimum }) {
             lastQuit = Date()
             NSRunningApplication(processIdentifier: victim.id)?.terminate() // demande normale : l'appli peut proposer d'enregistrer
+            Journal.write("fermeture", "\(victim.name), \(MemoryFormat.size(victim.bytes))")
             Log.app.info("Garde-fou : fermeture de \(victim.name, privacy: .public) (\(victim.bytes) octets)")
             Notifier.shared.guardQuit(app: victim)
             Task {
@@ -104,6 +117,7 @@ final class Guardian {
     private func notify(key: String, title: String, body: String, bundleID: String? = nil) {
         if let last = notified[key], Date().timeIntervalSince(last) < Self.notifyCooldown { return }
         notified[key] = Date()
+        Journal.write("alerte", title + " — " + body)
         Notifier.shared.guardAlert(id: key, title: title, body: body, bundleID: bundleID)
     }
 }
