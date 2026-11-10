@@ -1,5 +1,7 @@
 # mCLEAN
 
+[![Listed on OpenMacApps](https://openmacapps.com/badge.svg)](https://openmacapps.com/apps/mclean/)
+
 A small macOS menu bar app that shows your Mac's memory at a glance and frees it in one click. A personal take on AppYogi's *Memory Cleaner* — not affiliated with its authors.
 
 ## Features
