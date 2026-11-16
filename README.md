@@ -14,6 +14,8 @@ mCLEAN is a personal take on AppYogi's *Memory Cleaner*, not affiliated with its
 
 mCLEAN is part of the **DESKTOP MAC TOOLKIT**, Starbudweiser's collection of macOS apps.
 
+![The mCLEAN menu bar panel showing available memory, a memory breakdown, the biggest apps and inactive apps, with Clean and Deep buttons.](docs/screenshot.png)
+
 ## Features
 
 - **Live memory** in the menu bar: a ring with the percentage used (or the amount available), turning orange or red under memory pressure.
