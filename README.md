@@ -12,6 +12,8 @@ A small macOS menu bar app that shows your Mac's memory at a glance and frees it
 
 mCLEAN is a personal take on AppYogi's *Memory Cleaner*, not affiliated with its authors. Made by Starbudweiser & Claude Code (Anthropic). MIT License, © 2026 Starbudweiser. Provided as is, without warranty of any kind.
 
+mCLEAN is part of the **DESKTOP MAC TOOLKIT**, Starbudweiser's collection of macOS apps.
+
 ## Features
 
 - **Live memory** in the menu bar: a ring with the percentage used (or the amount available), turning orange or red under memory pressure.
