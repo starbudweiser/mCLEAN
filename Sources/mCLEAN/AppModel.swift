@@ -136,6 +136,23 @@ final class AppModel: ObservableObject {
 
     private func applyFootprints(_ totals: [pid_t: UInt64]) {
         let now = Date()
+        #if MCLEAN_SELFTEST
+        // Capture publique : MCLEAN_DEMO=1 remplace les applis réelles par des applis système neutres (rien de personnel à l'écran).
+        if ProcessInfo.processInfo.environment["MCLEAN_DEMO"] != nil {
+            func demo(_ n: Int32, _ name: String, _ path: String, _ gb: Double, hoursAgo: Double) -> AppUsage {
+                AppUsage(id: n, name: name, bundleID: "demo.\(n)", icon: NSWorkspace.shared.icon(forFile: path),
+                         bytes: UInt64(gb * 1_073_741_824), lastActive: now.addingTimeInterval(-hoursAgo * 3600))
+            }
+            let list = [demo(1, "Safari", "/Applications/Safari.app", 2.4, hoursAgo: 0.1),
+                        demo(2, "Photos", "/System/Applications/Photos.app", 1.6, hoursAgo: 6),
+                        demo(3, "Mail", "/System/Applications/Mail.app", 0.9, hoursAgo: 0.5),
+                        demo(4, "Notes", "/System/Applications/Notes.app", 0.5, hoursAgo: 9)]
+            hogs = list
+            idleApps = list.filter { $0.lastActive < now.addingTimeInterval(-3 * 3600) }
+            inactive = settings.showInactive ? idleApps : []
+            return
+        }
+        #endif
         let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
         var apps: [AppUsage] = []
         for app in NSWorkspace.shared.runningApplications where app.activationPolicy == .regular {

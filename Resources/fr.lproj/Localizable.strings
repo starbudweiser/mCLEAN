@@ -89,6 +89,7 @@
 "updates.errInstall" = "Échec : impossible de remplacer l'appli dans son dossier.";
 "updates.errBusy" = "Un nettoyage est en cours, réessayez ensuite.";
 "about.menu" = "À propos de mCLEAN";
+"about.collection" = "Fait partie du DESKTOP MAC TOOLKIT";
 "about.tagline" = "Surveille la mémoire du Mac depuis la barre de menus et la libère en un clic.";
 "about.version" = "Version %@ (%@)";
 "about.authors" = "Par Starbudweiser & Claude Code (Anthropic).";

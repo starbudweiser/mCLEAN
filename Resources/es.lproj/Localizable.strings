@@ -89,6 +89,7 @@
 "updates.errInstall" = "Error: no se pudo reemplazar la app en su carpeta.";
 "updates.errBusy" = "Hay una limpieza en curso, inténtalo después.";
 "about.menu" = "Acerca de mCLEAN";
+"about.collection" = "Forma parte del DESKTOP MAC TOOLKIT";
 "about.tagline" = "Vigila la memoria del Mac desde la barra de menús y la libera con un clic.";
 "about.version" = "Versión %@ (%@)";
 "about.authors" = "Por Starbudweiser y Claude Code (Anthropic).";

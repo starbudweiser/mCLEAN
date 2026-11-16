@@ -99,6 +99,7 @@ T = [
 ("updates.errBusy", "Un nettoyage est en cours, réessayez ensuite.", "A clean is running, try again afterwards.", "Hay una limpieza en curso, inténtalo después.", "Pulizia in corso, riprova dopo."),
 # --- à propos
 ("about.menu", "À propos de mCLEAN", "About mCLEAN", "Acerca de mCLEAN", "Informazioni su mCLEAN"),
+("about.collection", "Fait partie du DESKTOP MAC TOOLKIT", "Part of the DESKTOP MAC TOOLKIT", "Forma parte del DESKTOP MAC TOOLKIT", "Fa parte del DESKTOP MAC TOOLKIT"),
 ("about.tagline", "Surveille la mémoire du Mac depuis la barre de menus et la libère en un clic.", "Monitors your Mac's memory from the menu bar and frees it in one click.", "Vigila la memoria del Mac desde la barra de menús y la libera con un clic.", "Controlla la memoria del Mac dalla barra dei menu e la libera con un clic."),
 ("about.version", "Version %@ (%@)", "Version %@ (%@)", "Versión %@ (%@)", "Versione %@ (%@)"),
 ("about.authors", "Par Starbudweiser & Claude Code (Anthropic).", "By Starbudweiser & Claude Code (Anthropic).", "Por Starbudweiser y Claude Code (Anthropic).", "Di Starbudweiser e Claude Code (Anthropic)."),

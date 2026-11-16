@@ -89,6 +89,7 @@
 "updates.errInstall" = "Errore: impossibile sostituire l'app nella sua cartella.";
 "updates.errBusy" = "Pulizia in corso, riprova dopo.";
 "about.menu" = "Informazioni su mCLEAN";
+"about.collection" = "Fa parte del DESKTOP MAC TOOLKIT";
 "about.tagline" = "Controlla la memoria del Mac dalla barra dei menu e la libera con un clic.";
 "about.version" = "Versione %@ (%@)";
 "about.authors" = "Di Starbudweiser e Claude Code (Anthropic).";

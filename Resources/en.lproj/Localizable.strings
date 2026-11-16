@@ -89,6 +89,7 @@
 "updates.errInstall" = "Failed: could not replace the app in its folder.";
 "updates.errBusy" = "A clean is running, try again afterwards.";
 "about.menu" = "About mCLEAN";
+"about.collection" = "Part of the DESKTOP MAC TOOLKIT";
 "about.tagline" = "Monitors your Mac's memory from the menu bar and frees it in one click.";
 "about.version" = "Version %@ (%@)";
 "about.authors" = "By Starbudweiser & Claude Code (Anthropic).";
