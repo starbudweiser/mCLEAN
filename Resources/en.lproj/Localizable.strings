@@ -51,6 +51,9 @@
 "theme.system" = "System";
 "settings.guard" = "Safeguard: keep the Mac from freezing";
 "settings.guardHelp" = "Watches memory and CPU closely. When memory gets critical or an app runs away, it alerts you with a Quit button.";
+"settings.guardAI" = "AI and render jobs: auto-pause when the memory margin runs out";
+"notify.guardPauseTitle" = "%@ was paused";
+"notify.guardPauseBody" = "It was using %@ and available memory fell below the safety margin. It resumes automatically once memory frees up.";
 "settings.guardCPU" = "Slow down background apps that saturate the CPU";
 "settings.guardAutoQuit" = "In an emergency, quit inactive apps";
 "notify.guardEmergencyTitle" = "Critical memory: the Mac may freeze";

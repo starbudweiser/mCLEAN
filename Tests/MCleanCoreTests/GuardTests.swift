@@ -105,4 +105,30 @@ final class GuardTests: XCTestCase {
         XCTAssertFalse(shouldAutoClean(settings: s, snapshot: low, lastRun: nil, now: now, busy: false, calmFor: 120, userIdle: 60))
         XCTAssertFalse(shouldAutoClean(settings: s, snapshot: low, lastRun: nil, now: now, busy: false, calmFor: .infinity, userIdle: 3 * 3600))
     }
+
+    func testAIReserveScalesWithRAM() {
+        XCTAssertEqual(aiReserve(total: 64 * gb), 8 * gb)
+        XCTAssertEqual(aiReserve(total: 16 * gb), 6 * gb) // plancher
+    }
+
+    func testAIPausesBelowReserveOnlyWhenPressured() {
+        XCTAssertEqual(aiAction(snapshot(used: 30), paused: false, pausedFor: 0), .none)
+        XCTAssertEqual(aiAction(snapshot(used: 58, pressure: .warning), paused: false, pausedFor: 0), .pause) // 6 Go libres < 8
+        XCTAssertEqual(aiAction(snapshot(used: 58), paused: false, pausedFor: 0), .none)                      // 6 Go, pression normale : on laisse
+        XCTAssertEqual(aiAction(snapshot(used: 60), paused: false, pausedFor: 0), .pause)                     // 4 Go < 60 % de la marge
+    }
+
+    func testAIResumesWhenMemoryReturnsOrAfterMaxPause() {
+        XCTAssertEqual(aiAction(snapshot(used: 58), paused: true, pausedFor: 10), .none)
+        XCTAssertEqual(aiAction(snapshot(used: 50), paused: true, pausedFor: 10), .resume) // 14 Go libres ≥ 10
+        XCTAssertEqual(aiAction(snapshot(used: 60), paused: true, pausedFor: 95), .resume) // jamais gelé indéfiniment
+    }
+
+    func testHeavyComputeDetection() {
+        XCTAssertTrue(isHeavyCompute(path: "/opt/homebrew/.../Python.app/Contents/MacOS/Python", footprint: 10 * gb, isGUIApp: false))
+        XCTAssertFalse(isHeavyCompute(path: "/opt/homebrew/bin/python3", footprint: gb, isGUIApp: false))        // trop léger
+        XCTAssertFalse(isHeavyCompute(path: "/Applications/Brave Browser.app/Contents/MacOS/Brave", footprint: 6 * gb, isGUIApp: true))
+        XCTAssertFalse(isHeavyCompute(path: "/System/Library/CoreServices/WindowServer", footprint: 9 * gb, isGUIApp: false))
+        XCTAssertTrue(isHeavyCompute(path: "/usr/local/bin/monmodele", footprint: 5 * gb, isGUIApp: false))     // gros processus sans interface
+    }
 }

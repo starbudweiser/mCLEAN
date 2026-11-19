@@ -27,6 +27,7 @@ public struct AppSettings: Codable, Equatable {
     public var guardEnabled = true
     public var guardAutoQuit = false
     public var guardCPU = true
+    public var guardAI = true
 
     public init() {}
 
@@ -50,6 +51,7 @@ public struct AppSettings: Codable, Equatable {
         guardEnabled = (try? c.decode(Bool.self, forKey: .guardEnabled)) ?? d.guardEnabled
         guardAutoQuit = (try? c.decode(Bool.self, forKey: .guardAutoQuit)) ?? d.guardAutoQuit
         guardCPU = (try? c.decode(Bool.self, forKey: .guardCPU)) ?? d.guardCPU
+        guardAI = (try? c.decode(Bool.self, forKey: .guardAI)) ?? d.guardAI
     }
 
     /// Ramène les valeurs dans les plages de l'interface.

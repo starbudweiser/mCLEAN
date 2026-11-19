@@ -150,6 +150,7 @@ struct SettingsView: View {
             toggle(L("settings.guard"), $model.settings.guardEnabled)
             Text(L("settings.guardHelp")).socle(Socle.T.meta).foregroundStyle(Socle.C.textMuted).fixedSize(horizontal: false, vertical: true)
             Group {
+                toggle(L("settings.guardAI"), $model.settings.guardAI)
                 toggle(L("settings.guardCPU"), $model.settings.guardCPU)
                 toggle(L("settings.guardAutoQuit"), $model.settings.guardAutoQuit)
             }

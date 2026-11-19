@@ -51,6 +51,9 @@
 "theme.system" = "Sistema";
 "settings.guard" = "Protección: evitar que el Mac se congele";
 "settings.guardHelp" = "Vigila de cerca la memoria y el procesador. Cuando la memoria es crítica o una app se desboca, te avisa con un botón Salir.";
+"settings.guardAI" = "Cálculos de IA y renders: pausa automática si el margen de memoria se agota";
+"notify.guardPauseTitle" = "%@ en pausa";
+"notify.guardPauseBody" = "Ocupaba %@ y la memoria disponible bajó del margen de seguridad. Se reanuda sola cuando se libere memoria.";
 "settings.guardCPU" = "Ralentizar las apps en segundo plano que saturan el procesador";
 "settings.guardAutoQuit" = "En una emergencia, cerrar las apps inactivas";
 "notify.guardEmergencyTitle" = "Memoria crítica: el Mac puede congelarse";

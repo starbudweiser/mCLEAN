@@ -13,6 +13,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let model = AppModel()
     private var status: StatusController?
 
+    func applicationWillTerminate(_ notification: Notification) {
+        model.guardian.resumeAll("arrêt de mCLEAN")
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         Socle.brand("mCLEAN", color: Brand.color)
         Notifier.shared.configure(model: model)

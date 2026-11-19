@@ -98,3 +98,36 @@ public struct GuardTracker {
 public func cpuSaturated(load1: Double, cores: Int) -> Bool {
     cores > 0 && load1 > 1.5 * Double(cores)
 }
+
+// MARK: - Calculs lourds (modèles et agents IA)
+
+/// Marge de mémoire disponible à ne jamais entamer : 1/8 de la RAM, 6 Go au minimum (8 Go sur 64 Go).
+public func aiReserve(total: UInt64) -> UInt64 { max(6 * 1_073_741_824, total / 8) }
+
+public enum AIAction: Equatable { case none, pause, resume }
+
+/// Décision sur les calculs lourds. On met en pause sous la marge si la pression monte, ou franchement sous elle (60 %) ;
+/// on reprend dès que la mémoire est revenue à 125 % de la marge, et de toute façon après `maxPause`, pour qu'un calcul
+/// ne reste jamais gelé indéfiniment (c'est lui qui tient la mémoire, elle ne remontera pas seule).
+public func aiAction(_ s: MemorySnapshot, paused: Bool, pausedFor: TimeInterval, maxPause: TimeInterval = 90) -> AIAction {
+    let reserve = aiReserve(total: s.total)
+    if paused {
+        if pausedFor >= maxPause { return .resume }
+        return s.pressure == .normal && s.available >= reserve / 4 * 5 ? .resume : .none
+    }
+    if s.pressure != .normal && s.available < reserve { return .pause }
+    return s.available < reserve / 5 * 3 ? .pause : .none
+}
+
+/// Reconnaît un calcul lourd d'IA ou de rendu d'après son nom ou son chemin, au-delà de `minimum` octets d'empreinte ;
+/// un processus sans interface (hors applis) qui dépasse `anyBackgroundMinimum` compte aussi.
+public func isHeavyCompute(path: String, footprint: UInt64, isGUIApp: Bool,
+                           minimum: UInt64 = 1_500_000_000, anyBackgroundMinimum: UInt64 = 4_000_000_000) -> Bool {
+    let p = path.lowercased()
+    let never = ["windowserver", "kernel", "launchd", "virtualization", "qemu", "utm.app", "mclean", "wclaude", "claude.app", "loginwindow"]
+    if never.contains(where: p.contains) { return false }
+    let known = ["python", "mlx", "ollama", "llama", "comfy", "ltx", "flux", "fibo", "aerender", "blender", "diffusion", "whisper",
+                 "torch", "lmstudio", "lm studio", "c4dpy", "gguf", "vllm", "transformers", "swiftlm", "hyperframes", "ffmpeg"]
+    if footprint >= minimum, known.contains(where: p.contains) { return true }
+    return !isGUIApp && footprint >= anyBackgroundMinimum
+}

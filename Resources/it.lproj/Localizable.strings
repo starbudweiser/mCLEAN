@@ -51,6 +51,9 @@
 "theme.system" = "Sistema";
 "settings.guard" = "Protezione: evitare che il Mac si blocchi";
 "settings.guardHelp" = "Sorveglia da vicino memoria e processore. Quando la memoria diventa critica o un'app impazzisce, ti avvisa con un pulsante Esci.";
+"settings.guardAI" = "Calcoli IA e render: pausa automatica se il margine di memoria si esaurisce";
+"notify.guardPauseTitle" = "%@ messo in pausa";
+"notify.guardPauseBody" = "Occupava %@ e la memoria disponibile è scesa sotto il margine di sicurezza. Riprende da solo appena si libera memoria.";
 "settings.guardCPU" = "Rallenta le app in background che saturano il processore";
 "settings.guardAutoQuit" = "In emergenza, chiudi le app inattive";
 "notify.guardEmergencyTitle" = "Memoria critica: il Mac rischia di bloccarsi";

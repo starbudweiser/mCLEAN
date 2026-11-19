@@ -51,6 +51,9 @@
 "theme.system" = "Système";
 "settings.guard" = "Garde-fou : éviter que le Mac se fige";
 "settings.guardHelp" = "Surveille de près la mémoire et le processeur. Quand la mémoire devient critique, ou qu'une appli s'emballe, il vous prévient avec un bouton Quitter.";
+"settings.guardAI" = "Calculs IA et rendus : pause automatique si la marge de mémoire fond";
+"notify.guardPauseTitle" = "%@ mis en pause";
+"notify.guardPauseBody" = "Il occupait %@ et la mémoire disponible passait sous la marge de sécurité. Reprise automatique dès que la mémoire se libère.";
 "settings.guardCPU" = "Ralentir les applis d'arrière-plan qui saturent le processeur";
 "settings.guardAutoQuit" = "En urgence, quitter les applis inactives";
 "notify.guardEmergencyTitle" = "Mémoire critique : le Mac risque de se figer";

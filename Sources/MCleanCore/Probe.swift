@@ -73,4 +73,10 @@ public enum MemoryProbe {
         }
         return samples
     }
+
+    /// Chemin de l'exécutable d'un processus ("" s'il est illisible).
+    public static func path(of pid: pid_t) -> String {
+        var buffer = [CChar](repeating: 0, count: 4096)
+        return proc_pidpath(pid, &buffer, UInt32(buffer.count)) > 0 ? String(cString: buffer) : ""
+    }
 }
