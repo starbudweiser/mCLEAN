@@ -80,3 +80,9 @@ Petite appli de barre de menus pour macOS qui affiche la mémoire du Mac d'un co
 Installation : téléchargez la [dernière version notarisée](https://github.com/starbudweiser/mCLEAN/releases/latest), décompressez-la et placez **mCLEAN.app** dans Applications (macOS 14 Sonoma ou plus récent).
 
 Interface en français, anglais, espagnol et italien, choisie d'après la langue du Mac (anglais sinon). Licence MIT, © 2026 Starbudweiser. Questions et bugs : [Issues GitHub](https://github.com/starbudweiser/mCLEAN/issues).
+
+## Support / Soutenir
+
+This app is free. If it is useful to you, you can support the project (optional, no reward expected): [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
+
+Cette appli est gratuite. Si elle vous est utile, vous pouvez soutenir le projet (facultatif, sans contrepartie) : [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
